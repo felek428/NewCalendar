@@ -10,7 +10,7 @@
     
     <Grid>
         <local:NowyCalendar/>
-        <Calendar/>
+        
 
     </Grid>
 </Window>
