@@ -50,6 +50,10 @@ namespace NewCalendar
         /// Przechowuje miesiac poprzedzajacy obecnie wyswietlany
         /// </summary>
         private int previousMonth = (DateTime.Now.Month)-1;
+        /// <summary>
+        /// Liczba dni poprzedniego miesiaca wyswietlonego w widoku obecnego. Potrzebne do wyliczenia liczby pozostalego miejsca dla dni kolejnego miesiaca
+        /// </summary>
+        private int previusDaysNumber;
         public  int GetMonth
         {
             get { return actualMonth; }
@@ -255,14 +259,22 @@ namespace NewCalendar
         /// </summary>
         private void CreateNextMonthDays()
         {
+            var buffor = 0;
             var indexRow = rowStart;
             var MonthDays = Convert.ToInt32(DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month).ToString()); //pobiera liczbe dni wybranego miesiaca w roku
-            for (int i = 0; i < 9; i++)
+            for (int i = 0; i < 42-(previousDaysLimit+GetCurrentMonthDaysNumber(actualYear,actualMonth)); i++)
             {
-                string year = DateTime.Now.Year.ToString();
-                string month = (DateTime.Now.Month+1).ToString();
+                if (actualMonth == 12)
+                {
+                    buffor = 1;
+                }
+                else
+                {
+                    buffor = actualMonth+1;
+                }
 
-                var dayOfWeek = DateTime.Parse((year + "/" + month + "/" + (i + 1).ToString()).ToString()).DayOfWeek.ToString(); //sprawdza jaki to dzien tygodnia
+
+                var dayOfWeek = DateTime.Parse((actualYear + "/" + buffor + "/" + (i + 1).ToString()).ToString()).DayOfWeek.ToString(); //sprawdza jaki to dzien tygodnia
 
                 var lista = DaysOfWeek.ColumnDefinitions.ToList();
                 var indexCol = lista.IndexOf(DaysOfWeek.ColumnDefinitions.Where(c => c.Name == dayOfWeek).SingleOrDefault()); //pobieram index kolumny podanego dnia
@@ -281,15 +293,12 @@ namespace NewCalendar
                 {
                     indexRow++;
                 }
-
-
-                var xd = "ala";
             }
         }
 
         private void Previous_Click(object sender, RoutedEventArgs e)
         {
-            var zmienna = actualMonth;
+            
             if( actualMonth == 1)
             {
                 actualMonth = 12;
@@ -310,12 +319,14 @@ namespace NewCalendar
             }
             MonthName = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(actualMonth);
             MonthYear.Content = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(actualMonth);
+            rok.Text = actualYear.ToString();
             CreateCalendarDayButtonTest(GetCurrentMonthDaysNumber(actualYear,actualMonth), GetCurrentMonth());
 
 
             Console.WriteLine(actualYear);
             Console.WriteLine(GetMonth);
             CreatePreviousMonthDays(GetCurrentMonthDaysNumber(actualYear, previousMonth));
+            CreateNextMonthDays();
             //var miesiac = GetPreviousMonth();
             //var liczbadni= GetLastMonthDaysNumber();
             var ala = "asa";
