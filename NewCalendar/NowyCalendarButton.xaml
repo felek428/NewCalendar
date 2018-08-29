@@ -9,7 +9,11 @@
     <UserControl.DataContext>
         <local:NowyCalendarButtonDataModel/>
     </UserControl.DataContext>
-    <Button Content="{Binding Month}">
-        
-    </Button>
+    <UserControl.Template>
+        <ControlTemplate>
+            <Button Content="{Binding Path=Content, RelativeSource={x:Static RelativeSource.TemplatedParent}}"/>
+
+
+        </ControlTemplate>
+    </UserControl.Template>
 </UserControl>
