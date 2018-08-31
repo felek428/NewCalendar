@@ -54,6 +54,10 @@ namespace NewCalendar
         /// Przechowuje nastepny miesiac wzgledem obecnie wyswietanego
         /// </summary>
         private int nextMonth = (DateTime.Now.Month + 1);
+        /// <summary>
+        /// Stala liczba "dzieci" w gridzie od wyswietlania dni
+        /// </summary>
+        private static int gridChildren = 42;
         public  int GetMonth
         {
             get { return actualMonth; }
@@ -79,7 +83,11 @@ namespace NewCalendar
 
             DataContext = this;
         }
-
+        /// <summary>
+        /// Akcje po nacisnieciu glownego buttona
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MonthYear_Click(object sender, RoutedEventArgs e)
         {
 
@@ -102,8 +110,10 @@ namespace NewCalendar
             }
             Console.WriteLine(states);
         }
-
-        private void CreateCalendarButton() //tworzy userontrola dla miesiecy
+        /// <summary>
+        /// Tworzy objekt typu NowyCalendarButton na widoku miesiecy i lat
+        /// </summary>
+        private void CreateCalendarButton()
         {
             
             var monthNumber = 1; //Wykorzystywana przy uzupelnianiu contentu buttona poprzez nazwy miesiecy
@@ -111,26 +121,76 @@ namespace NewCalendar
             {
                 for (int j = 0; j < 4; j++)
                 {
-                    Button miesiac = new Button();
+                    NowyCalendarButton miesiac = new NowyCalendarButton();
+                    
                     if (states == 1)
                     {
                         var monthName = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(monthNumber);
-                        var monthNameBuffor = monthName.Substring(1);
-                        monthName = monthName.Substring(0, 1).ToUpper();
-                        miesiac.Content = monthName + monthNameBuffor;
+                        var monthNameBuffor = monthName.Substring(1); // przechowuje nazwe miesiaca z pominieciem 1 znaku
+                        monthName = monthName.Substring(0, 1).ToUpper(); // powieksza 1 litere miesiacca
+                        miesiac.Content = monthName + monthNameBuffor; // skleja 1 litere z reszta nazwy miesiaca i przypisuje do Contentu guzika
+                        miesiac.VerticalContentAlignment = VerticalAlignment.Center;
+                        miesiac.HorizontalContentAlignment = HorizontalAlignment.Center;
                         monthNumber += 1;
+                        var zmienna = DateTime.ParseExact(miesiac.Content.ToString().ToLower(), "MMMM", CultureInfo.CurrentCulture).Month;
+
+                        NowyCalendarButton now = new NowyCalendarButton();
+                        
+                        
                     } else if (states == 2)
                     {
-                        miesiac.Content = DateTime.Now.Year.ToString();
+                        miesiac.VerticalContentAlignment = VerticalAlignment.Center;
+                        miesiac.HorizontalContentAlignment = HorizontalAlignment.Center;
+                        miesiac.Content = 2017;
                     }
-                    miesiac.Click += new RoutedEventHandler(CalendarDayButtonClick);
-
+                    // miesiac.Click += new RoutedEventHandler(CalendarDayButtonClick);
+                    miesiac.MouseLeftButtonDown += new MouseButtonEventHandler(ClickDayButton); //Przypisuje do nowego objektu metode
                     YearView.Children.Add(miesiac);
                     Grid.SetColumn(miesiac, j);
                     Grid.SetRow(miesiac, i);
                 }
             }
         }
+        /// <summary>
+        /// Akcje po nacisnieciu na guzik NowyCallendarButton. Akcja zależy od  stanu w jakim jest kalendarz
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ClickDayButton(object sender, MouseButtonEventArgs e)
+        {
+            if(sender is NowyCalendarButton && states == 1 )
+            {
+                YearView.Children.Clear();
+                YearView.Visibility = Visibility.Hidden;
+                MonthView.Visibility = Visibility.Visible;
+
+                actualMonth = DateTime.ParseExact((sender as NowyCalendarButton).Content.ToString().ToLower(), "MMMM", CultureInfo.CurrentCulture).Month; // pobiera miesiac po nacisnieciu guzika i nastepnie zamienia go na int
+                previousMonth = actualMonth - 1;
+                nextMonth = actualMonth + 1;
+                CreateCalendarDayButtonTest(GetCurrentMonthDaysNumber(actualYear, actualMonth), actualMonth);
+                
+                if(actualMonth == 1)
+                {
+                    previousMonth = 12;
+                }
+                if(actualMonth == 12)
+                {
+                    nextMonth = 1;
+                }
+                MonthYear.Content = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(actualMonth); // przypisanie na nowo nazwy obecnego miesiaca i wyswietlenie na buttonie
+                states = 0;
+            }
+            else if (sender is NowyCalendarButton && states == 2)
+            {
+                YearView.Children.Clear();
+                actualYear = Convert.ToInt32((sender as NowyCalendarButton).Content);
+                MonthYear.Content = actualYear;
+                states = 1;
+                CreateCalendarButton();
+
+            }
+        }
+
         private void CreateCalendarDayButton() //tworzy usercontrol dla dni miesiaca
         {
             int pom = 0;
@@ -164,10 +224,10 @@ namespace NewCalendar
 
                 var dayOfWeek = DateTime.Parse((actualYear + "/" + month + "/" + (i+1).ToString()).ToString()).DayOfWeek.ToString(); //sprawdza jaki to dzien tygodnia
                 
-                var lista = DaysOfWeek.ColumnDefinitions.ToList();
+                var lista = DaysOfWeek.ColumnDefinitions.ToList(); // pobieram kolumny do listy 
                 var indexCol = lista.IndexOf(DaysOfWeek.ColumnDefinitions.Where(c => c.Name == dayOfWeek).SingleOrDefault()); //pobieram index kolumny podanego dnia
                 
-                if(i == 0)
+                if(i == 0) //pobieram numer kolumny w ktorej zostal wpisany 1 dzien podczas 1 iteracji
                 {
                     previousDaysLimit = indexCol;
                 }
@@ -283,7 +343,7 @@ namespace NewCalendar
             var yearBuffor = actualYear;
             var indexRow = rowStart;
             var MonthDays = Convert.ToInt32(DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month).ToString()); //pobiera liczbe dni wybranego miesiaca w roku
-            for (int i = 0; i < 42-(previousDaysLimit+GetCurrentMonthDaysNumber(actualYear,actualMonth)); i++)
+            for (int i = 0; i < gridChildren-(previousDaysLimit+GetCurrentMonthDaysNumber(actualYear,actualMonth)); i++) // 42 stala liczba "dzieci" w gridzie, dlatego wpisana statycznie
             {
                 if (actualMonth == 12)
                 {
@@ -324,34 +384,52 @@ namespace NewCalendar
         /// <param name="e"></param>
         private void Previous_Click(object sender, RoutedEventArgs e)
         {
-            
-            if( actualMonth == 1)
+            if(states == 0)
             {
-                actualMonth = 12;
-                actualYear -= 1;
+                if (actualMonth == 1)
+                {
+                    actualMonth = 12;
+                    actualYear -= 1;
+                }
+                else
+                {
+                    actualMonth -= 1;
+                }
+
+                if (previousMonth == 1)
+                {
+                    previousMonth = 12;
+                    nextMonth -= 1;
+                }else if(previousMonth == 11)
+                {
+                    previousMonth -= 1;
+                    nextMonth = 12;
+                }
+                else
+                {
+                    previousMonth -= 1;
+                    nextMonth -= 1;
+                }
+                MonthName = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(actualMonth);
+                MonthYear.Content = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(actualMonth); //pobiera nazwe miesiaca w jezyku jaki jest ustawiony na komputerze na podstawie int'a
+                rok.Text = actualYear.ToString();
+                CreateCalendarDayButtonTest(GetCurrentMonthDaysNumber(actualYear, actualMonth), GetCurrentMonth());
+
+
+                Console.WriteLine(" previous "+previousMonth);
+                Console.WriteLine("next"+nextMonth);
+                CreatePreviousMonthDays(GetCurrentMonthDaysNumber(actualYear, previousMonth));
+                CreateNextMonthDays();
             }
-            else
+            else if (states == 1)
             {
-                actualMonth -= 1;
+
+            }
+            else if (states == 2)
+            {
+
             }
 
-            if(previousMonth == 1)
-            {
-                previousMonth = 12;
-            }
-            else
-            {
-                previousMonth -= 1;
-            }
-            MonthName = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(actualMonth);
-            MonthYear.Content = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(actualMonth);
-            rok.Text = actualYear.ToString();
-            CreateCalendarDayButtonTest(GetCurrentMonthDaysNumber(actualYear,actualMonth), GetCurrentMonth());
-
-
-            Console.WriteLine(previousMonth);
-            CreatePreviousMonthDays(GetCurrentMonthDaysNumber(actualYear, previousMonth));
-            CreateNextMonthDays();
             //var miesiac = GetPreviousMonth();
             //var liczbadni= GetLastMonthDaysNumber();
             var ala = "asa";
@@ -364,37 +442,46 @@ namespace NewCalendar
         /// <param name="e"></param>
         private void NextButton_Click(object sender, RoutedEventArgs e)
         {
-            if (actualMonth == 12)
+            if(states == 0)
             {
-                actualMonth = 1;
-                actualYear += 1;
-            }
-            else
-            {
-                actualMonth += 1;
-            }
+                if (actualMonth == 12)
+                {
+                    actualMonth = 1;
+                    actualYear += 1;
+                }
+                else
+                {
+                    actualMonth += 1;
+                }
 
-            if (nextMonth == 12)
+                if (nextMonth == 12)
+                {
+                    nextMonth = 1;
+                    previousMonth += 1;
+                }
+                else if (nextMonth == 2)
+                {
+                    previousMonth = 1;
+                    nextMonth += 1;
+                }
+                else
+                {
+                    previousMonth += 1;
+                    nextMonth += 1;
+                }
+                MonthYear.Content = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(actualMonth);
+                rok.Text = actualYear.ToString();
+                CreateCalendarDayButtonTest(GetCurrentMonthDaysNumber(actualYear, actualMonth), GetCurrentMonth());
+                CreatePreviousMonthDays(GetCurrentMonthDaysNumber(actualYear, previousMonth));
+                CreateNextMonthDays();
+                Console.WriteLine("previous" + previousMonth);
+            }else if(states == 1)
             {
-                nextMonth = 1;
-                previousMonth += 1;
-            }
-            else if(nextMonth == 2)
+
+            }else if(states == 2)
             {
-                previousMonth = 1;
-                nextMonth += 1;
+
             }
-            else
-            {
-                previousMonth += 1;
-                nextMonth += 1;
-            }
-            MonthYear.Content = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(actualMonth);
-            rok.Text = actualYear.ToString();
-            CreateCalendarDayButtonTest(GetCurrentMonthDaysNumber(actualYear, actualMonth), GetCurrentMonth());
-            CreatePreviousMonthDays(GetCurrentMonthDaysNumber(actualYear, previousMonth));
-            CreateNextMonthDays();
-            Console.WriteLine(previousMonth);
 
 
         }
@@ -444,5 +531,6 @@ namespace NewCalendar
 
             return actualMonth;
         }
+
     }
 }

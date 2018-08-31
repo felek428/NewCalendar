@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,7 +21,7 @@ namespace NewCalendar
     /// </summary>
     public partial class NowyCalendarButton : UserControl
     {
-        public string Zmienna { get; set; }
+        public string NrMiesiaca { get; set; }
         public NowyCalendarButton()
         {
             NowyCalendarButtonDataModel dm = new NowyCalendarButtonDataModel();
@@ -32,5 +33,16 @@ namespace NewCalendar
             
         }
 
+        private void UserControl_MouseEnter(object sender, MouseEventArgs e)
+        {
+            Background = new SolidColorBrush(Colors.MediumAquamarine);
+            Background.Opacity = 0.5;
+        }
+
+        private void UserControl_MouseLeave(object sender, MouseEventArgs e)
+        {
+            Background = new SolidColorBrush(Colors.SkyBlue);
+            Background.Opacity = 1;
+        }
     }
 }
