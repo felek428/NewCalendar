@@ -100,7 +100,7 @@ namespace NewCalendar
                 states = 2;
                 CreateCalendarButton();
             }
-            
+            Console.WriteLine(states);
         }
 
         private void CreateCalendarButton() //tworzy userontrola dla miesiecy
@@ -111,7 +111,7 @@ namespace NewCalendar
             {
                 for (int j = 0; j < 4; j++)
                 {
-                    NowyCalendarButton miesiac = new NowyCalendarButton();
+                    Button miesiac = new Button();
                     if (states == 1)
                     {
                         var monthName = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(monthNumber);
@@ -123,7 +123,7 @@ namespace NewCalendar
                     {
                         miesiac.Content = DateTime.Now.Year.ToString();
                     }
-                    
+                    miesiac.Click += new RoutedEventHandler(CalendarDayButtonClick);
 
                     YearView.Children.Add(miesiac);
                     Grid.SetColumn(miesiac, j);
@@ -176,6 +176,7 @@ namespace NewCalendar
 
                 NowyCalendarDayButton dzien = new NowyCalendarDayButton();
                 dzien.Content = i+1;
+                
                 
                 
 
@@ -398,6 +399,26 @@ namespace NewCalendar
 
         }
         /// <summary>
+        /// akcja po nacisnieciu przycisku z rokiem lub miesiacem
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CalendarDayButtonClick(object sender, RoutedEventArgs e)
+        {
+            if(sender is Button && states == 1)
+            {
+                YearView.Children.Clear();
+                YearView.Visibility = Visibility.Hidden;
+                MonthView.Visibility = Visibility.Visible;
+                states = 0;
+            }else if (sender is Button && states == 2)
+            {
+                states = 1;
+                CreateCalendarButton();
+                
+            }
+        }
+        /// <summary>
         /// Pobiera liczbe dni podanego miesiaca
         /// </summary>
         /// <param name="year">Rok</param>
@@ -423,7 +444,5 @@ namespace NewCalendar
 
             return actualMonth;
         }
-
-        
     }
 }
