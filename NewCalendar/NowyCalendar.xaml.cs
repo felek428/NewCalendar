@@ -58,6 +58,14 @@ namespace NewCalendar
         /// Stala liczba "dzieci" w gridzie od wyswietlania dni
         /// </summary>
         private static int gridChildren = 42;
+        /// <summary>
+        /// Lewy kraniec przedzialu przy wyswietlaniu lat
+        /// </summary>
+        private int fullYearLeft;
+        /// <summary>
+        /// Prawy kraniec przedzialu przy wyswietlaniu lat
+        /// </summary>
+        private int fullYearRight;
         public  int GetMonth
         {
             get { return actualMonth; }
@@ -99,12 +107,13 @@ namespace NewCalendar
                 MonthView.Visibility = Visibility.Hidden;
                 YearView.Visibility = Visibility.Visible;
                 CreateCalendarButton();
-                
+                MonthYear.Content = actualYear;
             }
             else if(states == 1)
             {
                 YearView.Children.Clear();
-
+                CreateYearSection();
+                MonthYear.Content = (fullYearLeft.ToString() + "-" + fullYearRight.ToString());
                 states = 2;
                 CreateCalendarButton();
             }
@@ -115,12 +124,13 @@ namespace NewCalendar
         /// </summary>
         private void CreateCalendarButton()
         {
-            
+            var yearBuffor = fullYearLeft;
             var monthNumber = 1; //Wykorzystywana przy uzupelnianiu contentu buttona poprzez nazwy miesiecy
             for (int i = 0; i < 3; i++)
             {
                 for (int j = 0; j < 4; j++)
                 {
+                    
                     NowyCalendarButton miesiac = new NowyCalendarButton();
                     
                     if (states == 1)
@@ -141,7 +151,32 @@ namespace NewCalendar
                     {
                         miesiac.VerticalContentAlignment = VerticalAlignment.Center;
                         miesiac.HorizontalContentAlignment = HorizontalAlignment.Center;
-                        miesiac.Content = 2017;
+                        //miesiac.Content = 2017;
+                        CreateYearSection();
+                        if (i == 0 && j == 0)
+                        {
+                            miesiac.Content = fullYearLeft - 1;
+                            miesiac.Opacity = 0.5;
+                            miesiac.IsEnabled = false;
+                        }
+                        else if (i == 2 && j == 3)
+                        {
+                            miesiac.Content = fullYearRight + 1;
+                            miesiac.Opacity = 0.5;
+                            miesiac.IsEnabled = false;
+                        }
+                        else if(i == 0 && j == 1)
+                        {
+                            miesiac.Content = fullYearLeft;
+                        }
+                        else
+                        {
+                            yearBuffor += 1;
+                            miesiac.Content = yearBuffor;
+                        }
+
+                        Console.WriteLine(fullYearLeft);
+                        Console.WriteLine(fullYearRight);
                     }
                     // miesiac.Click += new RoutedEventHandler(CalendarDayButtonClick);
                     miesiac.MouseLeftButtonDown += new MouseButtonEventHandler(ClickDayButton); //Przypisuje do nowego objektu metode
@@ -150,6 +185,16 @@ namespace NewCalendar
                     Grid.SetRow(miesiac, i);
                 }
             }
+        }
+
+        private void CreateYearSection()
+        {
+            var first2Numbers = actualYear.ToString().Substring(0, 2);
+            var last2Numbers = actualYear.ToString().Substring(2, 1);
+            last2Numbers = last2Numbers.Substring(0, 1) + 0;
+            fullYearLeft = Convert.ToInt32(first2Numbers + last2Numbers); // lewy kraniec przedzialu
+            last2Numbers = last2Numbers.Substring(0, 1) + 9;
+            fullYearRight = Convert.ToInt32(first2Numbers + last2Numbers);
         }
         /// <summary>
         /// Akcje po nacisnieciu na guzik NowyCallendarButton. Akcja zależy od  stanu w jakim jest kalendarz
@@ -177,6 +222,8 @@ namespace NewCalendar
                 {
                     nextMonth = 1;
                 }
+                CreatePreviousMonthDays(GetCurrentMonthDaysNumber(actualYear, previousMonth));
+                CreateNextMonthDays();
                 MonthYear.Content = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(actualMonth); // przypisanie na nowo nazwy obecnego miesiaca i wyswietlenie na buttonie
                 states = 0;
             }
@@ -423,11 +470,19 @@ namespace NewCalendar
             }
             else if (states == 1)
             {
-
+                actualYear -= 1;
+                MonthYear.Content = actualYear;
             }
             else if (states == 2)
             {
-
+                actualYear -= 10;
+                YearView.Children.Clear();
+                CreateYearSection();
+                CreateCalendarButton();
+                if((DateTime.Now.Year - actualYear)> 99)
+                {
+                    PreviousButton.IsEnabled = false;
+                }
             }
 
             //var miesiac = GetPreviousMonth();
@@ -477,12 +532,21 @@ namespace NewCalendar
                 Console.WriteLine("previous" + previousMonth);
             }else if(states == 1)
             {
-
-            }else if(states == 2)
-            {
-
+                actualYear += 1;
+                MonthYear.Content = actualYear;
             }
-
+            else if(states == 2)
+            {
+                actualYear += 10;
+                YearView.Children.Clear();
+                CreateYearSection();
+                CreateCalendarButton();
+                if ((DateTime.Now.Year - actualYear) < -98)
+                {
+                    NextButton.IsEnabled = false;
+                }
+            }
+            
 
         }
         /// <summary>
