@@ -5,14 +5,16 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:NewCalendar"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"  MouseDown="UserControl_MouseDown_1"  
+             d:DesignHeight="450" d:DesignWidth="800"  Background="White"   MouseRightButtonDown="UserControl_MouseRightButtonDown"
              >
-    <UserControl.Template>
-        <ControlTemplate>
-            <Button Background="Aquamarine" Content="{Binding Path=Content, RelativeSource={x:Static RelativeSource.TemplatedParent}}"/>
-        </ControlTemplate>
-    </UserControl.Template>
+    <DockPanel LastChildFill="True" Margin="0,0,0,0">
+        <TextBlock Name="Tekst" Text="{Binding Nrdnia}"  DockPanel.Dock="Top" TextAlignment="Justify" Margin="0,0,0,0"/>
+        <ScrollViewer Name="Viewer"  VerticalScrollBarVisibility="Auto" DockPanel.Dock="Top">
+            <DockPanel Name="Dok" LastChildFill="False"/>
+        </ScrollViewer>
 
+
+    </DockPanel>
 
 
 </UserControl>

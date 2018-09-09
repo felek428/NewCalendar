@@ -21,26 +21,77 @@ namespace NewCalendar
     public partial class NowyCalendarDayButton : UserControl
     {
         public string ContentConnect { get; set; }
+
+        public int Nrdnia { get; set; }
+
         public NowyCalendarDayButton()
         {
-            ContentConnect = "ala";
-            InitializeComponent();
             
+            InitializeComponent();
+
+            LinearGradientBrush gradient = new LinearGradientBrush();
+
+            gradient.StartPoint = new Point(0.5, 0);
+            gradient.EndPoint = new Point(0.5, 1);
+
+            gradient.GradientStops.Add(new GradientStop(Colors.AliceBlue, 0.0));
+            gradient.GradientStops.Add(new GradientStop(Colors.LightSteelBlue, 1.0));
+
+            Tekst.Background = gradient;
             // NowyCalendarDayButtonDataModel dm = new NowyCalendarDayButtonDataModel();
 
             // DataContext = dm;
 
 
 
-
+            DataContext = this;
 
         }
-        
-
-        private void UserControl_MouseDown_1(object sender, MouseButtonEventArgs e)
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            Background = new SolidColorBrush(Colors.DeepSkyBlue);
-            Background.Opacity = 100;
+            Label labelek = new Label();
+            labelek.Name = "Ala";
+            labelek.Content = "Ruja";
+            
+            labelek.ToolTip = labelek.Content;
+            
+            labelek.MouseLeftButtonDown += new MouseButtonEventHandler(LabelClick);
+
+
+
+            Border ramka = new Border();
+            ramka.BorderBrush = new SolidColorBrush(Colors.SkyBlue);
+            ramka.BorderThickness = new Thickness(1, 1, 1, 1);
+            ramka.CornerRadius = new CornerRadius(20, 20, 20, 20);
+            ramka.Background = new SolidColorBrush(Colors.AliceBlue);
+            ramka.Child = labelek;
+
+
+            Label test = new Label();
+            test.Content = "ala";
+
+           
+
+            Dok.Children.Add(ramka);
+            DockPanel.SetDock(ramka, Dock.Top);
+        }
+        private void LabelClick(object sender, MouseEventArgs et)
+        {
+            var zmienna = (sender as Label).Content;
+            MessageBox.Show("PL132143141413431\n" + zmienna.ToString());
+        }
+
+        private void UserControl_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            ContextMenu contextMenu = new ContextMenu();
+
+
+
+            MenuItem nowyLabel = new MenuItem();
+            nowyLabel.Header = "Dodaj notke";
+            nowyLabel.Click += new RoutedEventHandler(MenuItem_Click);
+            contextMenu.Items.Add(nowyLabel);
+            (sender as UserControl).ContextMenu = contextMenu;
         }
     }
 }

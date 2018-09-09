@@ -282,14 +282,19 @@ namespace NewCalendar
 
 
                 NowyCalendarDayButton dzien = new NowyCalendarDayButton();
-                dzien.Content = i+1;
-                
-                
-                
+                dzien.Nrdnia = i+1;
 
-                MonthView.Children.Add(dzien);
-                Grid.SetColumn(dzien, indexCol);
-                Grid.SetRow(dzien, indexRow);
+                Border ramka = new Border();
+                ramka.BorderThickness = new Thickness(1, 1, 1, 1);
+                ramka.BorderBrush = new SolidColorBrush(Colors.SkyBlue);
+
+                ramka.Child = dzien;
+
+
+
+                MonthView.Children.Add(ramka);
+                Grid.SetColumn(ramka, indexCol);
+                Grid.SetRow(ramka, indexRow);
 
                 if (dayOfWeek.Equals("Sunday"))
                 {
@@ -370,12 +375,19 @@ namespace NewCalendar
 
                 
                 NowyCalendarDayButton dzien = new NowyCalendarDayButton();
-                dzien.Content = monthDays - (i-1);
-                dzien.Opacity = 0.8;
+                dzien.Nrdnia = monthDays - (i-1);
+                dzien.Opacity = 0.2;
                 dzien.IsEnabled = false;
-                MonthView.Children.Add(dzien);
-                Grid.SetColumn(dzien, (previousDaysLimit-i));
-                Grid.SetRow(dzien, indexRow);
+
+                Border ramka = new Border();
+                ramka.BorderThickness = new Thickness(1, 1, 1, 1);
+                ramka.BorderBrush = new SolidColorBrush(Colors.SkyBlue);
+
+                ramka.Child = dzien;
+
+                MonthView.Children.Add(ramka);
+                Grid.SetColumn(ramka, (previousDaysLimit-i));
+                Grid.SetRow(ramka, indexRow);
 
                 
                 var xd = "ala";
@@ -410,13 +422,19 @@ namespace NewCalendar
 
                 
                 NowyCalendarDayButton dzien = new NowyCalendarDayButton();
-                dzien.Content = i + 1;
-                dzien.Opacity = 0.8;
+                dzien.Nrdnia = i + 1;
+                dzien.Opacity = 0.2;
                 dzien.IsEnabled = false;
 
-                MonthView.Children.Add(dzien);
-                Grid.SetColumn(dzien, indexCol);
-                Grid.SetRow(dzien, indexRow);
+                Border ramka = new Border();
+                ramka.BorderThickness = new Thickness(1, 1, 1, 1);
+                ramka.BorderBrush = new SolidColorBrush(Colors.SkyBlue);
+
+                ramka.Child = dzien;
+
+                MonthView.Children.Add(ramka);
+                Grid.SetColumn(ramka, indexCol);
+                Grid.SetRow(ramka, indexRow);
 
                 if (dayOfWeek.Equals("Sunday"))
                 {
@@ -479,7 +497,8 @@ namespace NewCalendar
                 YearView.Children.Clear();
                 CreateYearSection();
                 CreateCalendarButton();
-                if((DateTime.Now.Year - actualYear)> 99)
+                MonthYear.Content = (fullYearLeft.ToString() + "-" + fullYearRight.ToString());
+                if ((DateTime.Now.Year - actualYear)> 99)
                 {
                     PreviousButton.IsEnabled = false;
                 }
@@ -497,6 +516,7 @@ namespace NewCalendar
         /// <param name="e"></param>
         private void NextButton_Click(object sender, RoutedEventArgs e)
         {
+            
             if(states == 0)
             {
                 if (actualMonth == 12)
@@ -541,6 +561,7 @@ namespace NewCalendar
                 YearView.Children.Clear();
                 CreateYearSection();
                 CreateCalendarButton();
+                MonthYear.Content = (fullYearLeft.ToString() + "-" + fullYearRight.ToString());
                 if ((DateTime.Now.Year - actualYear) < -98)
                 {
                     NextButton.IsEnabled = false;
