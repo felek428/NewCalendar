@@ -6,15 +6,5 @@
              xmlns:local="clr-namespace:NewCalendar"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Background="SkyBlue" BorderThickness="1" BorderBrush="Black" MouseEnter="UserControl_MouseEnter" MouseLeave="UserControl_MouseLeave" >
-    <UserControl.DataContext>
-        <local:NowyCalendarButtonDataModel/>
-    </UserControl.DataContext>
     
-    <!--<UserControl.Template>
-        <ControlTemplate>
-            <Button Name="guzik" Content="{Binding Path=Content, RelativeSource={x:Static RelativeSource.TemplatedParent}}"/>
-
-
-        </ControlTemplate>
-    </UserControl.Template>-->
 </UserControl>

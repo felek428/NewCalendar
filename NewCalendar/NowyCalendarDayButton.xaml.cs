@@ -22,7 +22,10 @@ namespace NewCalendar
     {
         public string ContentConnect { get; set; }
 
-        public int Nrdnia { get; set; }
+        public int DayNumber { get; private set; }
+        public int ActualMonth { get; private set; }
+        public int ActualYear { get; private set; }
+
 
         public NowyCalendarDayButton()
         {
@@ -38,55 +41,100 @@ namespace NewCalendar
             gradient.GradientStops.Add(new GradientStop(Colors.LightSteelBlue, 1.0));
 
             Tekst.Background = gradient;
-            // NowyCalendarDayButtonDataModel dm = new NowyCalendarDayButtonDataModel();
-
-            // DataContext = dm;
-
-
 
             DataContext = this;
 
         }
+        public NowyCalendarDayButton(int day, int month, int year)
+        {
+            
+            DayNumber = day;
+            ActualMonth = month;
+            ActualYear = year;
+            InitializeComponent();
+
+            LinearGradientBrush gradient = new LinearGradientBrush(); //Tworzenie gradientu dla DayButton'a
+
+            gradient.StartPoint = new Point(0.5, 0);
+            gradient.EndPoint = new Point(0.5, 1);
+
+            gradient.GradientStops.Add(new GradientStop(Colors.AliceBlue, 0.0));
+            gradient.GradientStops.Add(new GradientStop(Colors.LightSteelBlue, 1.0));
+
+            Tekst.Background = gradient;
+
+            switch (day)
+            {
+                case 0:
+                    Label note = new Label();
+                    note.Name = "Ala";
+                    note.Content = "Ruja";
+
+                    note.ToolTip = note.Content;
+
+                    note.MouseLeftButtonDown += new MouseButtonEventHandler(LabelClick);
+
+                    Border borderNote = new Border();
+                    borderNote.BorderBrush = new SolidColorBrush(Colors.SkyBlue);
+                    borderNote.BorderThickness = new Thickness(1, 1, 1, 1);
+                    borderNote.CornerRadius = new CornerRadius(20, 20, 20, 20);
+                    borderNote.Background = new SolidColorBrush(Colors.AliceBlue);
+                    borderNote.Child = note;
+
+                    Label test = new Label();
+                    test.Content = "ala";
+
+                    Dok.Children.Add(borderNote);
+                    DockPanel.SetDock(borderNote, Dock.Top);
+                    break;
+                default:
+                    break;
+            }
+            DataContext = this;
+
+        }
+        /// <summary>
+        /// Akcja po wybraniu opcji z menu contextowego
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            Label labelek = new Label();
-            labelek.Name = "Ala";
-            labelek.Content = "Ruja";
+            Label note = new Label();
+            note.Name = "Ala";
+            note.Content = "Ruja";
             
-            labelek.ToolTip = labelek.Content;
+            note.ToolTip = note.Content;
             
-            labelek.MouseLeftButtonDown += new MouseButtonEventHandler(LabelClick);
+            note.MouseLeftButtonDown += new MouseButtonEventHandler(LabelClick);
 
-
-
-            Border ramka = new Border();
-            ramka.BorderBrush = new SolidColorBrush(Colors.SkyBlue);
-            ramka.BorderThickness = new Thickness(1, 1, 1, 1);
-            ramka.CornerRadius = new CornerRadius(20, 20, 20, 20);
-            ramka.Background = new SolidColorBrush(Colors.AliceBlue);
-            ramka.Child = labelek;
+            Border noteBorder = new Border();
+            noteBorder.BorderBrush = new SolidColorBrush(Colors.SkyBlue);
+            noteBorder.BorderThickness = new Thickness(1, 1, 1, 1);
+            noteBorder.CornerRadius = new CornerRadius(20, 20, 20, 20);
+            noteBorder.Background = new SolidColorBrush(Colors.AliceBlue);
+            noteBorder.Child = note;
 
 
             Label test = new Label();
-            test.Content = "ala";
 
-           
 
-            Dok.Children.Add(ramka);
-            DockPanel.SetDock(ramka, Dock.Top);
+            Dok.Children.Add(noteBorder);
+            DockPanel.SetDock(noteBorder, Dock.Top);
         }
         private void LabelClick(object sender, MouseEventArgs et)
         {
             var zmienna = (sender as Label).Content;
             MessageBox.Show("PL132143141413431\n" + zmienna.ToString());
         }
-
+        /// <summary>
+        /// Tworzy menu contextowe po nacisnieciu RPM
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void UserControl_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             ContextMenu contextMenu = new ContextMenu();
-
-
-
             MenuItem nowyLabel = new MenuItem();
             nowyLabel.Header = "Dodaj notke";
             nowyLabel.Click += new RoutedEventHandler(MenuItem_Click);
